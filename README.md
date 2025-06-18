@@ -1,7 +1,7 @@
 ---
 
 # 🎙 Echo Shield
-
+---
 > **Anti-Recording Defense for Lectures**
 > A system to protect in-person and online lectures from unauthorized recordings by injecting subtle audio distortions that are inaudible to humans but degrade recordings.
 
