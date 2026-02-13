@@ -7,12 +7,33 @@ import hashlib
 import json
 import os
 from datetime import datetime
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import io
+import io  
 import base64
 from werkzeug.utils import secure_filename
 import tempfile
 from pathlib import Path
+import time
+
+def safe_delete(file_path, max_retries=5, delay=0.2):
+    """Safely delete a file with retries for Windows file locking"""
+    if not os.path.exists(file_path):
+        return
+        
+    for i in range(max_retries):
+        try:
+            os.remove(file_path)
+            return
+        except PermissionError:
+            if i < max_retries - 1:
+                time.sleep(delay)
+            else:
+                print(f"Failed to delete {file_path} after {max_retries} retries")
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+            return
 
 app = Flask(__name__)
 app.secret_key = 'echo_shield_secret_key_2024'
@@ -47,7 +68,8 @@ class EchoShield:
         for i in range(0, len(fingerprint_hash), 4):
             # Convert hex chunk to frequency
             hex_chunk = fingerprint_hash[i:i+4]
-            freq_offset = int(hex_chunk, 16) % 1000  # 0-999 Hz offset
+            freq_range_width = self.fingerprint_freq_range[1] - self.fingerprint_freq_range[0]
+            freq_offset = int(hex_chunk, 16) % freq_range_width
             freq = self.fingerprint_freq_range[0] + freq_offset
             freq_pattern.append(freq)
         
@@ -148,8 +170,11 @@ class EchoShield:
         chunk_samples = int(chunk_duration * self.sample_rate)
         num_chunks = len(high_freq_signal) // chunk_samples
         
-        detected_frequencies = []
-        confidences = []
+        # Track frequency detections across chunks for persistence filtering
+        from collections import Counter
+        freq_bin_counts = Counter()  # How many chunks each frequency bin appears in
+        freq_bin_magnitudes = {}  # Best magnitude for each frequency bin
+        freq_bin_size = 20  # Hz resolution for binning nearby frequencies
         
         for i in range(num_chunks):
             start_idx = i * chunk_samples
@@ -169,9 +194,13 @@ class EchoShield:
                 chunk_freqs = freqs[freq_mask]
                 chunk_magnitudes = magnitude[freq_mask]
                 
-                # Find peaks
+                # Find peaks with stricter threshold
                 if len(chunk_magnitudes) > 0:
-                    threshold = np.mean(chunk_magnitudes) + 2 * np.std(chunk_magnitudes)
+                    threshold = np.mean(chunk_magnitudes) + 3 * np.std(chunk_magnitudes)
+                    # Add minimum absolute magnitude floor relative to median
+                    # This rejects noise while allowing legitimate low-amplitude fingerprints
+                    min_magnitude = 5 * np.median(chunk_magnitudes)
+                    threshold = max(threshold, min_magnitude)
                     peaks = chunk_magnitudes > threshold
                     
                     if np.any(peaks):
@@ -179,8 +208,22 @@ class EchoShield:
                         peak_mags = chunk_magnitudes[peaks]
                         
                         for freq, mag in zip(peak_freqs, peak_mags):
-                            detected_frequencies.append(freq)
-                            confidences.append(mag)
+                            # Bin the frequency for persistence tracking
+                            freq_bin = round(freq / freq_bin_size) * freq_bin_size
+                            freq_bin_counts[freq_bin] += 1
+                            if freq_bin not in freq_bin_magnitudes or mag > freq_bin_magnitudes[freq_bin]:
+                                freq_bin_magnitudes[freq_bin] = mag
+        
+        # Persistence filtering: only keep frequencies detected in multiple chunks
+        # A real fingerprint repeats periodically, noise spikes are random
+        min_chunk_appearances = max(2, num_chunks // 3) if num_chunks >= 3 else 1
+        
+        detected_frequencies = []
+        confidences = []
+        for freq_bin, count in freq_bin_counts.items():
+            if count >= min_chunk_appearances:
+                detected_frequencies.append(freq_bin)
+                confidences.append(freq_bin_magnitudes[freq_bin])
         
         return detected_frequencies, confidences
     
@@ -194,7 +237,7 @@ class EchoShield:
         
         results = {
             'file_path': audio_path,
-            'protection_detected': len(detected_freqs) > 0,
+            'protection_detected': False,  # Only True if a known fingerprint matches
             'detected_frequencies': detected_freqs[:20],  # Limit output
             'avg_confidence': np.mean(confidences) if confidences else 0,
             'num_detections': len(detected_freqs)
@@ -207,19 +250,93 @@ class EchoShield:
             
             for fp_id, fp_data in known_fingerprints.items():
                 if 'frequencies' in fp_data:
-                    # Calculate match score
-                    score = self.calculate_match_score(detected_freqs, fp_data['frequencies'])
+                    # Step 1: Basic frequency match
+                    basic_score = self.calculate_match_score(detected_freqs, fp_data['frequencies'])
+                    
+                    # Step 2: Targeted spectral spike detection
+                    # Check if each fingerprint freq shows a spike vs its neighbors
+                    spike_score = self._check_spectral_spikes(audio, fp_data['frequencies'])
+                    
+                    # Combined score: both must be strong for a true match
+                    # A fingerprint tone should both be detected AND show a spike
+                    score = basic_score * 0.4 + spike_score * 0.6
+                    
                     if score > best_score:
                         best_score = score
                         best_match = fp_id
             
             results['best_match'] = best_match
             results['match_score'] = best_score
-            results['likely_match'] = best_score > 0.3  # Threshold for positive match
+            results['likely_match'] = best_score > 0.4  # Threshold for positive match
+            results['protection_detected'] = best_score > 0.4  # Match-based detection
         
         return results
     
-    def calculate_match_score(self, detected_freqs, fingerprint_freqs, tolerance=50):
+    def _check_spectral_spikes(self, audio_signal, fingerprint_freqs):
+        """Check if fingerprint frequencies show spectral spikes vs neighbors.
+        
+        A deliberately inserted pure tone creates a sharp peak at its exact 
+        frequency. Natural music content is spectrally smoother. By comparing
+        the magnitude at each fingerprint frequency to its local neighborhood,
+        we can distinguish real fingerprints from coincidental frequency matches.
+        """
+        high_freq_signal = self.extract_high_freq_content(audio_signal)
+        
+        # Use longer FFT for better frequency resolution
+        chunk_duration = 4.0  # seconds
+        chunk_samples = min(int(chunk_duration * self.sample_rate), len(high_freq_signal))
+        num_chunks = max(1, len(high_freq_signal) // chunk_samples)
+        
+        spike_counts = 0
+        total_checks = 0
+        neighborhood_hz = 100  # Compare against ±100 Hz neighbors
+        spike_threshold = 2.0  # Spike must be 2x the neighborhood average
+        
+        for i in range(min(num_chunks, 5)):  # Check up to 5 chunks
+            start_idx = i * chunk_samples
+            end_idx = start_idx + chunk_samples
+            chunk = high_freq_signal[start_idx:end_idx]
+            
+            fft = np.fft.fft(chunk)
+            freqs = np.fft.fftfreq(len(chunk), 1 / self.sample_rate)
+            magnitude = np.abs(fft)
+            
+            freq_resolution = self.sample_rate / len(chunk)
+            
+            for fp_freq in fingerprint_freqs:
+                # Find the FFT bin closest to the fingerprint frequency
+                fp_bin = int(round(fp_freq / freq_resolution))
+                if fp_bin >= len(magnitude):
+                    continue
+                
+                fp_magnitude = magnitude[fp_bin]
+                
+                # Get neighborhood bins (excluding the target bin)
+                neighbor_bins = int(neighborhood_hz / freq_resolution)
+                low_bin = max(0, fp_bin - neighbor_bins)
+                high_bin = min(len(magnitude), fp_bin + neighbor_bins + 1)
+                
+                # Exclude the target bin and its immediate neighbors from the neighborhood
+                exclude_bins = max(1, int(10 / freq_resolution))  # ±10 Hz exclusion
+                neighborhood = np.concatenate([
+                    magnitude[low_bin:max(low_bin, fp_bin - exclude_bins)],
+                    magnitude[min(high_bin, fp_bin + exclude_bins + 1):high_bin]
+                ])
+                
+                if len(neighborhood) > 0:
+                    neighborhood_avg = np.mean(neighborhood)
+                    if neighborhood_avg > 0:
+                        spike_ratio = fp_magnitude / neighborhood_avg
+                        if spike_ratio > spike_threshold:
+                            spike_counts += 1
+                total_checks += 1
+        
+        if total_checks == 0:
+            return 0
+        
+        return spike_counts / total_checks
+    
+    def calculate_match_score(self, detected_freqs, fingerprint_freqs, tolerance=10):
         """Calculate how well detected frequencies match fingerprint"""
         if not detected_freqs or not fingerprint_freqs:
             return 0
@@ -311,9 +428,12 @@ def generate_protection():
         protection_audio = echo_shield.generate_protection_audio(fingerprint, duration * 60)
         
         # Save to temporary file
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.wav', 
-                                               dir=app.config['UPLOAD_FOLDER'])
-        sf.write(temp_file.name, protection_audio, echo_shield.sample_rate)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav', 
+                                               dir=app.config['UPLOAD_FOLDER']) as temp_file:
+            temp_path = temp_file.name
+        
+        # File is closed here, safe to write to path
+        sf.write(temp_path, protection_audio, echo_shield.sample_rate)
         
         # Save fingerprint to database
         fingerprint_db = echo_shield.load_fingerprint_database()
@@ -374,7 +494,7 @@ def mix_protection():
         echo_shield.save_fingerprint_database(fingerprint_db)
         
         # Clean up input file
-        os.remove(input_path)
+        safe_delete(input_path)
         
         return jsonify({
             'success': True,
@@ -420,7 +540,7 @@ def analyze_recording():
         plot_data = echo_shield.plot_frequency_analysis(input_path)
         
         # Clean up uploaded file
-        os.remove(input_path)
+        safe_delete(input_path)
         
         # Prepare response
         response_data = {
@@ -488,12 +608,13 @@ def export_database():
         fingerprint_db = echo_shield.load_fingerprint_database()
         
         # Create temporary export file
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.json', 
-                                               dir=app.config['UPLOAD_FOLDER'])
-        with open(temp_file.name, 'w') as f:
-            json.dump(fingerprint_db, f, indent=2)
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json', 
+                                               dir=app.config['UPLOAD_FOLDER']) as temp_file:
+            json.dump(fingerprint_db, temp_file, indent=2)
+            temp_path = temp_file.name
         
-        return send_file(temp_file.name, as_attachment=True, 
+        # File is closed here
+        return send_file(temp_path, as_attachment=True, 
                         download_name='fingerprint_export.json')
         
     except Exception as e:

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Echo Shield Desktop Application
 Audio Enhancement System for Online Learning

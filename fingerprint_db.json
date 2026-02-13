@@ -1,18 +1,50 @@
 {
-  "TCS408 Programming in Java": {
-    "lecture_id": "TCS408 Programming in Java",
-    "instructor_name": "Dr. Sushant Chamoli",
-    "timestamp": "2025-06-19T01:33:10.105835",
-    "hash": "10a097e7cc1ecfe7bff16afad993f0f866fd371f68d2f7accaa56c85252fdb48",
+  "TCS 695": {
+    "lecture_id": "TCS 695",
+    "instructor_name": "Dr. Saumitro",
+    "timestamp": "2026-02-12T23:07:26.240544",
+    "hash": "5559c3b696228e927eebfb6eedadecb3c8581c7b1d0900f595a2ff26f74857c6",
     "frequencies": [
-      18256,
-      18887,
-      18254,
-      18223,
-      18137,
-      18386,
-      18699,
-      18688
+      19849,
+      20102,
+      20434,
+      18498,
+      18491,
+      18366,
+      18845,
+      18595
+    ]
+  },
+  "tcs 595": {
+    "lecture_id": "tcs 595",
+    "instructor_name": "Dr. Saumitro",
+    "timestamp": "2026-02-12T23:12:38.524822",
+    "hash": "5bcf1458a72db0b62a75d30e6320937e9059441599aabb4518b8164b37b63331",
+    "frequencies": [
+      21503,
+      19208,
+      20797,
+      19238,
+      20869,
+      20030,
+      19376,
+      19758
+    ]
+  },
+  "tcs 555": {
+    "lecture_id": "tcs 555",
+    "instructor_name": "saumitro",
+    "timestamp": "2026-02-12T23:38:57.153741",
+    "hash": "1556dd4a81f2471f580416b7e179b76f9152abcc518baf35005408aa40f97949",
+    "frequencies": [
+      19462,
+      18650,
+      19266,
+      20207,
+      20532,
+      19815,
+      19721,
+      20959
     ]
   }
 }

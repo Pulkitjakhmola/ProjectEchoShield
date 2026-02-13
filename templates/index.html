@@ -3,9 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echo Shield - Lecture Protection System</title>
+    <title>Echo Shield - Audio Protection System</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #252d3d;
+            --bg-card: #1e2533;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #7c3aed;
+            --accent-gradient: linear-gradient(135deg, #00d9ff 0%, #7c3aed 100%);
+            --text-primary: #e4e7eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-color: #2d3748;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,166 +34,312 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            color: #333;
         }
 
+        /* Navbar */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            background: rgba(30, 37, 51, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 2rem;
+            height: 70px;
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
             text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo i {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.75rem;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
         }
 
         .nav-menu {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 0.5rem;
         }
 
         .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             text-decoration: none;
-            color: #333;
+            color: var(--text-secondary);
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
+            transition: var(--transition);
+            font-size: 0.95rem;
         }
 
-        .nav-item a:hover, .nav-item a.active {
-            background: #667eea;
+        .nav-item a:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item a.active {
+            background: var(--accent-gradient);
             color: white;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
 
+        /* Hero Section */
         .hero {
             text-align: center;
-            padding: 4rem 0;
-            color: white;
+            padding: 5rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            font-weight: 800;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
         }
 
         .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
         }
 
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        /* Feature Grid */
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 1.5rem;
             margin-top: 3rem;
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 16px;
+            transition: var(--transition);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: var(--transition);
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .feature-content {
+            position: relative;
+            z-index: 1;
         }
 
         .feature-icon {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
+            width: 60px;
+            height: 60px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 217, 255, 0.3);
+        }
+
+        .feature-icon i {
+            font-size: 1.75rem;
+            color: white;
         }
 
         .feature-card h3 {
             font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #333;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .feature-card p {
-            color: #666;
-            line-height: 1.6;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
         }
 
+        /* Page Header */
         .page-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 16px;
             margin-bottom: 2rem;
             text-align: center;
         }
 
+        .page-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .page-header h2 i {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        /* Form Container */
         .form-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
+            font-size: 0.95rem;
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: var(--transition);
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.1);
         }
 
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* File Upload */
         .file-upload {
             position: relative;
-            display: inline-block;
+            display: block;
             width: 100%;
         }
 
@@ -182,71 +349,169 @@
             width: 100%;
             height: 100%;
             cursor: pointer;
+            z-index: 2;
         }
 
         .file-upload-label {
-            display: block;
-            padding: 2rem;
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            text-align: center;
-            background: #f8f9ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: var(--transition);
         }
 
         .file-upload-label:hover {
-            background: #e8ebff;
-            border-color: #5a67d8;
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .file-upload-label:hover::before {
+            opacity: 0.05;
+        }
+
+        .file-upload-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
 
         .file-upload-label i {
-            font-size: 2rem;
-            color: #667eea;
-            margin-bottom: 0.5rem;
+            font-size: 3rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+        .file-upload-label .upload-text {
+            color: var(--text-primary);
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        .file-upload-label small {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Buttons */
+        .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.4);
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
+        .btn-danger:hover {
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        /* Result Container */
         .result-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 16px;
             margin-top: 2rem;
             display: none;
+            box-shadow: var(--shadow-md);
         }
 
         .result-container.show {
@@ -265,210 +530,372 @@
             }
         }
 
+        /* Alerts */
         .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .alert i {
+            font-size: 1.25rem;
         }
 
         .alert-success {
-            background: #f0fff4;
-            border: 1px solid #9ae6b4;
-            color: #276749;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
         }
 
         .alert-danger {
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
-            color: #742a2a;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
         }
 
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+
+        /* Fingerprint Info */
         .fingerprint-info {
-            background: #f7fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
         }
 
         .fingerprint-info h4 {
-            color: #2d3748;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .fingerprint-info p {
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .fingerprint-info p:last-of-type {
+            border-bottom: none;
+        }
+
+        .fingerprint-info strong {
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .frequency-display {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
         }
 
         .frequency-tag {
-            background: #667eea;
+            background: var(--accent-gradient);
             color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 217, 255, 0.3);
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Database Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
         .database-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
+            background: var(--bg-card);
         }
 
         .database-table th,
         .database-table td {
-            padding: 1rem;
+            padding: 1.25rem 1.5rem;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .database-table th {
-            background: #667eea;
-            color: white;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
             font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .database-table tr:hover {
-            background: #f7fafc;
+        .database-table td {
+            color: var(--text-secondary);
         }
 
+        .database-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .database-table tr:hover td {
+            background: var(--bg-secondary);
+        }
+
+        /* Analysis Result */
         .analysis-result {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
             margin-top: 2rem;
         }
 
         .analysis-details {
-            background: #f7fafc;
+            background: var(--bg-secondary);
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
         .analysis-details h4 {
-            color: #2d3748;
-            margin-bottom: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .detail-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .match-info {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 1rem;
+        .detail-item:last-child {
+            border-bottom: none;
         }
 
+        .detail-item span:first-child {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .detail-item span:last-child {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Confidence Badge */
         .confidence-badge {
             display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .confidence-high {
-            background: #48bb78;
-            color: white;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
         .confidence-medium {
-            background: #ed8936;
-            color: white;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.4);
         }
 
         .confidence-low {
-            background: #f56565;
-            color: white;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.4);
         }
 
+        /* Plot Container */
         .plot-container {
-            text-align: center;
             margin-top: 2rem;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .plot-container h4 {
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
         }
 
         .plot-container img {
-            max-width: 100%;
+            width: 100%;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
         }
 
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .action-bar h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-gradient {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-menu {
                 display: none;
             }
 
             .hero h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
             }
 
             .analysis-result {
                 grid-template-columns: 1fr;
             }
+
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .action-buttons .btn {
+                flex: 1;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
         }
 
-        .hidden {
-            display: none;
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-color);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo" onclick="showPage('home')">
-                <i class="fas fa-shield-alt"></i> Echo Shield
+            <a class="logo" onclick="showPage('home')">
+                <i class="fas fa-shield-alt"></i>
+                <span>Echo Shield</span>
             </a>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" onclick="showPage('home')" class="nav-link active">Home</a>
+                    <a href="#" onclick="showPage('home')" class="nav-link active">
+                        <i class="fas fa-home"></i> Home
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" onclick="showPage('generate')" class="nav-link">Generate</a>
+                    <a href="#" onclick="showPage('generate')" class="nav-link">
+                        <i class="fas fa-magic"></i> Generate
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" onclick="showPage('mix')" class="nav-link">Mix Audio</a>
+                    <a href="#" onclick="showPage('mix')" class="nav-link">
+                        <i class="fas fa-music"></i> Mix Audio
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" onclick="showPage('analyze')" class="nav-link">Analyze</a>
+                    <a href="#" onclick="showPage('analyze')" class="nav-link">
+                        <i class="fas fa-search"></i> Analyze
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" onclick="showPage('database')" class="nav-link">Database</a>
+                    <a href="#" onclick="showPage('database')" class="nav-link">
+                        <i class="fas fa-database"></i> Database
+                    </a>
                 </li>
             </ul>
         </div>
@@ -478,41 +905,55 @@
         <!-- Home Page -->
         <div id="home-page" class="page">
             <div class="hero">
-                <h1><i class="fas fa-shield-alt"></i> Echo Shield</h1>
-                <p>Advanced Lecture Protection System using Inaudible Audio Fingerprinting</p>
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-shield-check"></i>
+                        Advanced Audio Protection
+                    </div>
+                    <h1>Echo Shield</h1>
+                    <p>Protect your lectures with inaudible audio fingerprinting technology. Detect unauthorized recordings and safeguard your intellectual property.</p>
+                </div>
             </div>
 
             <div class="feature-grid">
                 <div class="feature-card" onclick="showPage('generate')">
-                    <div class="feature-icon">
-                        <i class="fas fa-magic"></i>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3>Generate Protection</h3>
+                        <p>Create inaudible protection signals that can be played alongside your lectures to prevent unauthorized recordings and track distribution.</p>
                     </div>
-                    <h3>Generate Protection</h3>
-                    <p>Create inaudible protection audio that can be played alongside your lectures to prevent unauthorized recordings.</p>
                 </div>
 
                 <div class="feature-card" onclick="showPage('mix')">
-                    <div class="feature-icon">
-                        <i class="fas fa-music"></i>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <h3>Mix with Audio</h3>
+                        <p>Seamlessly embed protection signals directly into your lecture recordings for integrated, transparent protection.</p>
                     </div>
-                    <h3>Mix with Audio</h3>
-                    <p>Directly embed protection signals into your lecture recordings for seamless protection.</p>
                 </div>
 
                 <div class="feature-card" onclick="showPage('analyze')">
-                    <div class="feature-icon">
-                        <i class="fas fa-search"></i>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3>Analyze Recordings</h3>
+                        <p>Detect and identify Echo Shield protection in suspicious audio files with detailed forensic analysis and matching.</p>
                     </div>
-                    <h3>Analyze Recordings</h3>
-                    <p>Detect and identify Echo Shield protection in suspicious audio recordings with detailed analysis.</p>
                 </div>
 
                 <div class="feature-card" onclick="showPage('database')">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Fingerprint Database</h3>
+                        <p>Manage your collection of lecture fingerprints, track deployments, and maintain a comprehensive protection registry.</p>
                     </div>
-                    <h3>Fingerprint Database</h3>
-                    <p>Manage your collection of lecture fingerprints and track protection deployments.</p>
                 </div>
             </div>
         </div>
@@ -527,19 +968,34 @@
             <div class="form-container">
                 <form id="generate-form">
                     <div class="form-group">
-                        <label for="lecture-id">Lecture ID *</label>
-                        <input type="text" id="lecture-id" name="lecture_id" required 
-                               placeholder="e.g., TCS409 Design and Analysis of Algorithms">
+                        <label for="lecture-id">
+                            <i class="fas fa-bookmark"></i> Lecture ID *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="lecture-id" 
+                            name="lecture_id" 
+                            required 
+                            placeholder="e.g., TCS409 Design and Analysis of Algorithms"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="instructor-name">Instructor Name</label>
-                        <input type="text" id="instructor-name" name="instructor_name" 
-                               placeholder="e.g., Dr. Sushant Chamoli">
+                        <label for="instructor-name">
+                            <i class="fas fa-user"></i> Instructor Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="instructor-name" 
+                            name="instructor_name" 
+                            placeholder="e.g., Dr. Sushant Chamoli"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="duration">Duration (minutes)</label>
+                        <label for="duration">
+                            <i class="fas fa-clock"></i> Duration
+                        </label>
                         <select id="duration" name="duration">
                             <option value="60">60 minutes</option>
                             <option value="90">90 minutes</option>
@@ -555,25 +1011,40 @@
 
                 <div class="loading" id="generate-loading">
                     <div class="spinner"></div>
-                    <p>Generating protection audio...</p>
+                    <p>Generating protection audio with unique fingerprint...</p>
                 </div>
 
                 <div class="result-container" id="generate-result">
                     <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> Protection audio generated successfully!
+                        <i class="fas fa-check-circle"></i>
+                        <span>Protection audio generated successfully!</span>
                     </div>
+                    
                     <div class="fingerprint-info">
-                        <h4>Fingerprint Information</h4>
-                        <p><strong>Lecture ID:</strong> <span id="result-lecture-id"></span></p>
-                        <p><strong>Instructor:</strong> <span id="result-instructor"></span></p>
-                        <p><strong>Generated:</strong> <span id="result-timestamp"></span></p>
+                        <h4><i class="fas fa-fingerprint"></i> Fingerprint Information</h4>
+                        <p>
+                            <strong>Lecture ID:</strong>
+                            <span id="result-lecture-id">-</span>
+                        </p>
+                        <p>
+                            <strong>Instructor:</strong>
+                            <span id="result-instructor">-</span>
+                        </p>
+                        <p>
+                            <strong>Generated:</strong>
+                            <span id="result-timestamp">-</span>
+                        </p>
                         <p><strong>Key Frequencies:</strong></p>
                         <div class="frequency-display" id="result-frequencies"></div>
                     </div>
-                    <div style="margin-top: 1rem;">
-                        <a href="#" id="download-link" class="btn btn-success">
+                    
+                    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                        <a href="#" id="download-link" class="btn btn-success" style="flex: 1;">
                             <i class="fas fa-download"></i> Download Protection Audio
                         </a>
+                        <button onclick="showPage('generate'); resetForm('generate-form')" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> Generate Another
+                        </button>
                     </div>
                 </div>
             </div>
@@ -589,25 +1060,48 @@
             <div class="form-container">
                 <form id="mix-form">
                     <div class="form-group">
-                        <label for="mix-lecture-id">Lecture ID *</label>
-                        <input type="text" id="mix-lecture-id" name="lecture_id" required 
-                               placeholder="e.g., TCS409 Design and Analysis of Algorithms">
+                        <label for="mix-lecture-id">
+                            <i class="fas fa-bookmark"></i> Lecture ID *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="mix-lecture-id" 
+                            name="lecture_id" 
+                            required 
+                            placeholder="e.g., TCS409 Design and Analysis of Algorithms"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="mix-instructor-name">Instructor Name</label>
-                        <input type="text" id="mix-instructor-name" name="instructor_name" 
-                               placeholder="e.g., Dr. Sushant Chamoli">
+                        <label for="mix-instructor-name">
+                            <i class="fas fa-user"></i> Instructor Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="mix-instructor-name" 
+                            name="instructor_name" 
+                            placeholder="e.g., Dr. Sushant Chamoli"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label>Audio File *</label>
+                        <label>
+                            <i class="fas fa-file-audio"></i> Audio File *
+                        </label>
                         <div class="file-upload">
-                            <input type="file" id="mix-audio-file" name="audio_file" accept=".wav,.mp3,.m4a,.flac" required>
+                            <input 
+                                type="file" 
+                                id="mix-audio-file" 
+                                name="audio_file" 
+                                accept=".wav,.mp3,.m4a,.flac" 
+                                required
+                            >
                             <label for="mix-audio-file" class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <div>Click to upload or drag and drop</div>
-                                <small>Supported: WAV, MP3, M4A, FLAC (max 100MB)</small>
+                                <div class="file-upload-content">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div class="upload-text">Click to upload or drag and drop</div>
+                                    <small>Supported: WAV, MP3, M4A, FLAC • Max 100MB</small>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -619,25 +1113,40 @@
 
                 <div class="loading" id="mix-loading">
                     <div class="spinner"></div>
-                    <p>Processing audio and mixing protection...</p>
+                    <p>Processing audio and embedding protection signals...</p>
                 </div>
 
                 <div class="result-container" id="mix-result">
                     <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> Audio successfully protected!
+                        <i class="fas fa-check-circle"></i>
+                        <span>Audio successfully protected with embedded fingerprint!</span>
                     </div>
+                    
                     <div class="fingerprint-info">
-                        <h4>Protection Details</h4>
-                        <p><strong>Lecture ID:</strong> <span id="mix-result-lecture-id"></span></p>
-                        <p><strong>Instructor:</strong> <span id="mix-result-instructor"></span></p>
-                        <p><strong>Generated:</strong> <span id="mix-result-timestamp"></span></p>
+                        <h4><i class="fas fa-fingerprint"></i> Protection Details</h4>
+                        <p>
+                            <strong>Lecture ID:</strong>
+                            <span id="mix-result-lecture-id">-</span>
+                        </p>
+                        <p>
+                            <strong>Instructor:</strong>
+                            <span id="mix-result-instructor">-</span>
+                        </p>
+                        <p>
+                            <strong>Generated:</strong>
+                            <span id="mix-result-timestamp">-</span>
+                        </p>
                         <p><strong>Key Frequencies:</strong></p>
                         <div class="frequency-display" id="mix-result-frequencies"></div>
                     </div>
-                    <div style="margin-top: 1rem;">
-                        <a href="#" id="mix-download-link" class="btn btn-success">
+                    
+                    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                        <a href="#" id="mix-download-link" class="btn btn-success" style="flex: 1;">
                             <i class="fas fa-download"></i> Download Protected Audio
                         </a>
+                        <button onclick="showPage('mix'); resetForm('mix-form')" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> Process Another
+                        </button>
                     </div>
                 </div>
             </div>
@@ -653,13 +1162,23 @@
             <div class="form-container">
                 <form id="analyze-form">
                     <div class="form-group">
-                        <label>Audio File to Analyze *</label>
+                        <label>
+                            <i class="fas fa-file-audio"></i> Audio File to Analyze *
+                        </label>
                         <div class="file-upload">
-                            <input type="file" id="analyze-audio-file" name="audio_file" accept=".wav,.mp3,.m4a,.flac" required>
+                            <input 
+                                type="file" 
+                                id="analyze-audio-file" 
+                                name="audio_file" 
+                                accept=".wav,.mp3,.m4a,.flac" 
+                                required
+                            >
                             <label for="analyze-audio-file" class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <div>Click to upload or drag and drop</div>
-                                <small>Supported: WAV, MP3, M4A, FLAC (max 100MB)</small>
+                                <div class="file-upload-content">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div class="upload-text">Click to upload or drag and drop</div>
+                                    <small>Supported: WAV, MP3, M4A, FLAC • Max 100MB</small>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -671,7 +1190,7 @@
 
                 <div class="loading" id="analyze-loading">
                     <div class="spinner"></div>
-                    <p>Analyzing audio for protection signals...</p>
+                    <p>Analyzing audio for protection signals and fingerprints...</p>
                 </div>
 
                 <div class="result-container" id="analyze-result">
@@ -679,7 +1198,7 @@
                     
                     <div class="analysis-result">
                         <div class="analysis-details">
-                            <h4>Detection Results</h4>
+                            <h4><i class="fas fa-chart-line"></i> Detection Results</h4>
                             <div class="detail-item">
                                 <span>Protection Detected:</span>
                                 <span id="protection-detected">-</span>
@@ -695,7 +1214,7 @@
                         </div>
 
                         <div id="match-details" class="analysis-details">
-                            <h4>Match Information</h4>
+                            <h4><i class="fas fa-fingerprint"></i> Match Information</h4>
                             <div class="detail-item">
                                 <span>Lecture ID:</span>
                                 <span id="match-lecture-id">-</span>
@@ -719,9 +1238,15 @@
                         </div>
                     </div>
 
-                    <div class="plot-container" id="plot-container">
-                        <h4>Frequency Analysis</h4>
+                    <div class="plot-container" id="plot-container" style="display: none;">
+                        <h4><i class="fas fa-chart-area"></i> Frequency Analysis</h4>
                         <img id="frequency-plot" src="" alt="Frequency Analysis Plot">
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <button onclick="showPage('analyze'); resetForm('analyze-form')" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Analyze Another File
+                        </button>
                     </div>
                 </div>
             </div>
@@ -731,15 +1256,15 @@
         <div id="database-page" class="page hidden">
             <div class="page-header">
                 <h2><i class="fas fa-database"></i> Fingerprint Database</h2>
-                <p>Manage your collection of lecture fingerprints</p>
+                <p>Manage your collection of lecture fingerprints and protection records</p>
             </div>
 
             <div class="form-container">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div class="action-bar">
                     <h3>Stored Fingerprints</h3>
-                    <div>
-                        <button onclick="refreshDatabase()" class="btn">
-                            <i class="fas fa-refresh"></i> Refresh
+                    <div class="action-buttons">
+                        <button onclick="refreshDatabase()" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                         <button onclick="exportDatabase()" class="btn btn-success">
                             <i class="fas fa-download"></i> Export
@@ -749,24 +1274,26 @@
 
                 <div class="loading" id="database-loading">
                     <div class="spinner"></div>
-                    <p>Loading database...</p>
+                    <p>Loading fingerprint database...</p>
                 </div>
 
                 <div id="database-content">
-                    <table class="database-table" id="fingerprint-table">
-                        <thead>
-                            <tr>
-                                <th>Lecture ID</th>
-                                <th>Instructor</th>
-                                <th>Created</th>
-                                <th>Frequencies</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="fingerprint-tbody">
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
+                    <div class="table-container">
+                        <table class="database-table" id="fingerprint-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-bookmark"></i> Lecture ID</th>
+                                    <th><i class="fas fa-user"></i> Instructor</th>
+                                    <th><i class="fas fa-calendar"></i> Created</th>
+                                    <th><i class="fas fa-wave-square"></i> Frequencies</th>
+                                    <th><i class="fas fa-cog"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fingerprint-tbody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -790,7 +1317,13 @@
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            event.target.classList.add('active');
+            
+            // Find and activate the correct nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${pageName}'`)) {
+                    link.classList.add('active');
+                }
+            });
 
             currentPage = pageName;
 
@@ -800,14 +1333,29 @@
             }
         }
 
+        // Reset form
+        function resetForm(formId) {
+            document.getElementById(formId).reset();
+            const resultId = formId.replace('-form', '-result');
+            document.getElementById(resultId).classList.remove('show');
+        }
+
         // File upload handling
         function setupFileUploads() {
             const fileInputs = document.querySelectorAll('input[type="file"]');
             fileInputs.forEach(input => {
                 input.addEventListener('change', function(e) {
                     const label = this.nextElementSibling;
-                    const fileName = this.files[0] ? this.files[0].name : 'Click to upload or drag and drop';
-                    label.querySelector('div').textContent = fileName;
+                    const uploadText = label.querySelector('.upload-text');
+                    if (this.files[0]) {
+                        const fileName = this.files[0].name;
+                        const fileSize = formatFileSize(this.files[0].size);
+                        uploadText.innerHTML = `<i class="fas fa-file-audio"></i> ${fileName} (${fileSize})`;
+                        label.style.borderColor = 'var(--accent-primary)';
+                    } else {
+                        uploadText.textContent = 'Click to upload or drag and drop';
+                        label.style.borderColor = 'var(--border-color)';
+                    }
                 });
             });
         }
@@ -854,12 +1402,14 @@
                     
                     document.getElementById('download-link').href = result.download_url;
                     document.getElementById('generate-result').classList.add('show');
+                    
+                    showNotification('Protection audio generated successfully!', 'success');
                 } else {
-                    alert('Error: ' + result.error);
+                    showNotification('Error: ' + result.error, 'danger');
                 }
             } catch (error) {
                 document.getElementById('generate-loading').classList.remove('show');
-                alert('Error generating protection audio: ' + error.message);
+                showNotification('Error generating protection audio: ' + error.message, 'danger');
             }
         });
 
@@ -901,12 +1451,14 @@
                     
                     document.getElementById('mix-download-link').href = result.download_url;
                     document.getElementById('mix-result').classList.add('show');
+                    
+                    showNotification('Audio protected successfully!', 'success');
                 } else {
-                    alert('Error: ' + result.error);
+                    showNotification('Error: ' + result.error, 'danger');
                 }
             } catch (error) {
                 document.getElementById('mix-loading').classList.remove('show');
-                alert('Error mixing audio: ' + error.message);
+                showNotification('Error mixing audio: ' + error.message, 'danger');
             }
         });
 
@@ -933,9 +1485,10 @@
                 
                 if (result.success) {
                     // Update detection results
-                    document.getElementById('protection-detected').textContent = result.protection_detected ? 'YES' : 'NO';
-                    document.getElementById('protection-detected').style.color = result.protection_detected ? '#48bb78' : '#f56565';
-                    document.getElementById('protection-detected').style.fontWeight = 'bold';
+                    const detectedSpan = document.getElementById('protection-detected');
+                    detectedSpan.textContent = result.protection_detected ? 'YES' : 'NO';
+                    detectedSpan.style.color = result.protection_detected ? 'var(--success)' : 'var(--danger)';
+                    detectedSpan.style.fontWeight = 'bold';
                     
                     document.getElementById('num-detections').textContent = result.num_detections;
                     document.getElementById('avg-confidence').textContent = result.avg_confidence.toFixed(3);
@@ -943,11 +1496,11 @@
                     // Show appropriate alert
                     const alertDiv = document.getElementById('analyze-alert');
                     if (result.protection_detected) {
-                        alertDiv.className = 'alert alert-success';
-                        alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Echo Shield protection detected in this recording!';
+                        alertDiv.className = 'alert alert-warning';
+                        alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Echo Shield protection detected in this recording!</span>';
                     } else {
-                        alertDiv.className = 'alert alert-danger';
-                        alertDiv.innerHTML = '<i class="fas fa-check-circle"></i> No Echo Shield protection detected.';
+                        alertDiv.className = 'alert alert-success';
+                        alertDiv.innerHTML = '<i class="fas fa-check-circle"></i> <span>No Echo Shield protection detected.</span>';
                     }
                     
                     // Handle match information
@@ -970,15 +1523,23 @@
                     if (result.plot_data) {
                         document.getElementById('frequency-plot').src = 'data:image/png;base64,' + result.plot_data;
                         document.getElementById('plot-container').style.display = 'block';
+                    } else {
+                        document.getElementById('plot-container').style.display = 'none';
                     }
                     
                     document.getElementById('analyze-result').classList.add('show');
+                    
+                    if (result.protection_detected) {
+                        showNotification('Protection detected in audio!', 'warning');
+                    } else {
+                        showNotification('Analysis complete - no protection found', 'success');
+                    }
                 } else {
-                    alert('Error: ' + result.error);
+                    showNotification('Error: ' + result.error, 'danger');
                 }
             } catch (error) {
                 document.getElementById('analyze-loading').classList.remove('show');
-                alert('Error analyzing audio: ' + error.message);
+                showNotification('Error analyzing audio: ' + error.message, 'danger');
             }
         });
 
@@ -988,21 +1549,10 @@
             document.getElementById('database-content').style.display = 'none';
             
             try {
-                const response = await fetch('/database');
-                const html = await response.text();
-                
-                // Parse the fingerprints from the response (this is a simplified approach)
-                // In a real implementation, you'd want a JSON API endpoint
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // For now, we'll simulate the database loading
-                // In your actual Flask app, create a JSON endpoint for this
                 await loadDatabaseJSON();
-                
             } catch (error) {
                 console.error('Error loading database:', error);
-                alert('Error loading database');
+                showNotification('Error loading database', 'danger');
             } finally {
                 document.getElementById('database-loading').classList.remove('show');
                 document.getElementById('database-content').style.display = 'block';
@@ -1011,42 +1561,60 @@
 
         async function loadDatabaseJSON() {
             try {
-                // This would be a new endpoint you'd need to add to your Flask app
                 const response = await fetch('/api/database');
                 const fingerprints = await response.json();
                 
                 const tbody = document.getElementById('fingerprint-tbody');
                 tbody.innerHTML = '';
                 
+                if (Object.keys(fingerprints).length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-database"></i>
+                                    <p>No fingerprints found in database</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
                 Object.entries(fingerprints).forEach(([lectureId, data]) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${lectureId}</td>
-                        <td>${data.instructor_name || 'N/A'}</td>
+                        <td><strong>${lectureId}</strong></td>
+                        <td>${data.instructor_name || '<em>N/A</em>'}</td>
                         <td>${new Date(data.timestamp).toLocaleString()}</td>
                         <td>
                             ${data.frequencies.slice(0, 3).map(f => 
                                 `<span class="frequency-tag">${Math.round(f)} Hz</span>`
                             ).join(' ')}
+                            ${data.frequencies.length > 3 ? `<span style="color: var(--text-muted); font-size: 0.85rem;">+${data.frequencies.length - 3} more</span>` : ''}
                         </td>
                         <td>
-                            <button onclick="deleteFingerprint('${lectureId}')" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                                <i class="fas fa-trash"></i> Delete
+                            <button onclick="deleteFingerprint('${lectureId}')" class="btn btn-danger" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
                 
-                if (Object.keys(fingerprints).length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No fingerprints found</td></tr>';
-                }
-                
             } catch (error) {
                 console.error('Error loading database JSON:', error);
-                // Fallback to showing empty state
                 const tbody = document.getElementById('fingerprint-tbody');
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">Error loading fingerprints</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading fingerprints</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
         }
 
@@ -1067,17 +1635,19 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    loadDatabase(); // Reload the database
+                    loadDatabase();
+                    showNotification('Fingerprint deleted successfully', 'success');
                 } else {
-                    alert('Error deleting fingerprint: ' + result.error);
+                    showNotification('Error deleting fingerprint: ' + result.error, 'danger');
                 }
             } catch (error) {
-                alert('Error deleting fingerprint: ' + error.message);
+                showNotification('Error deleting fingerprint: ' + error.message, 'danger');
             }
         }
 
         function refreshDatabase() {
             loadDatabase();
+            showNotification('Database refreshed', 'success');
         }
 
         async function exportDatabase() {
@@ -1085,36 +1655,23 @@
                 const response = await fetch('/api/database/export');
                 const blob = await response.blob();
                 
-                // Create download link
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'fingerprint_export.json';
+                a.download = `fingerprint_export_${new Date().getTime()}.json`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
+                
+                showNotification('Database exported successfully', 'success');
             } catch (error) {
-                alert('Error exporting database: ' + error.message);
+                showNotification('Error exporting database: ' + error.message, 'danger');
             }
         }
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            setupFileUploads();
-            
-            // Set up navigation event listeners
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('onclick').match(/'([^']+)'/)[1];
-                    showPage(page);
-                });
-            });
-        });
-
-        // Add some utility functions for better UX
+        // Utility functions
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -1123,24 +1680,28 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function showNotification(message, type = 'info') {
+        function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = `alert alert-${type}`;
             notification.style.position = 'fixed';
-            notification.style.top = '20px';
+            notification.style.top = '90px';
             notification.style.right = '20px';
             notification.style.zIndex = '9999';
-            notification.style.maxWidth = '300px';
-            notification.innerHTML = message;
+            notification.style.maxWidth = '400px';
+            notification.style.animation = 'slideIn 0.3s ease';
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'exclamation-triangle';
+            notification.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.remove();
-            }, 5000);
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
         }
 
-        // Enhanced file upload with drag and drop
+        // Drag and drop functionality
         function setupDragAndDrop() {
             document.querySelectorAll('.file-upload').forEach(upload => {
                 const input = upload.querySelector('input[type="file"]');
@@ -1156,26 +1717,20 @@
                 }
                 
                 ['dragenter', 'dragover'].forEach(eventName => {
-                    label.addEventListener(eventName, highlight, false);
+                    label.addEventListener(eventName, () => {
+                        label.style.borderColor = 'var(--accent-primary)';
+                        label.style.background = 'var(--bg-tertiary)';
+                    }, false);
                 });
                 
                 ['dragleave', 'drop'].forEach(eventName => {
-                    label.addEventListener(eventName, unhighlight, false);
+                    label.addEventListener(eventName, () => {
+                        label.style.borderColor = 'var(--border-color)';
+                        label.style.background = 'var(--bg-secondary)';
+                    }, false);
                 });
                 
-                function highlight(e) {
-                    label.style.background = '#e8ebff';
-                    label.style.borderColor = '#5a67d8';
-                }
-                
-                function unhighlight(e) {
-                    label.style.background = '#f8f9ff';
-                    label.style.borderColor = '#667eea';
-                }
-                
-                label.addEventListener('drop', handleDrop, false);
-                
-                function handleDrop(e) {
+                label.addEventListener('drop', function(e) {
                     const dt = e.dataTransfer;
                     const files = dt.files;
                     
@@ -1184,14 +1739,30 @@
                         const event = new Event('change', { bubbles: true });
                         input.dispatchEvent(event);
                     }
-                }
+                }, false);
             });
         }
 
-        // Call setup functions when DOM is loaded
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupFileUploads();
             setupDragAndDrop();
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideOut {
+                    from {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                    to {
+                        opacity: 0;
+                        transform: translateX(100%);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>
