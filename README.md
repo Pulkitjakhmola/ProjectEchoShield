@@ -38,6 +38,9 @@ soundfile==0.12.1
 scipy==1.13.1
 matplotlib==3.9.0
 werkzeug==3.0.3
+gunicorn
+waitress
+
 ```
 
 ---
